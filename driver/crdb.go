@@ -112,7 +112,7 @@ func (d *CockroachDBDriver) Assemble(config drivers.Config) (dbinfo *drivers.DBI
 func (d *CockroachDBDriver) TableNames(schema string, whitelist, blacklist []string) ([]string, error) {
 	var names []string
 
-	query := fmt.Sprintf(`select table_name from information_schema.tables where table_schema = $1`)
+	query := fmt.Sprintf(`select table_name from information_schema.tables where table_schema = $1 and table_type <> 'VIEW'`)
 	args := []interface{}{schema}
 	if len(whitelist) > 0 {
 		tables := drivers.TablesFromList(whitelist)
@@ -148,6 +148,65 @@ func (d *CockroachDBDriver) TableNames(schema string, whitelist, blacklist []str
 	}
 
 	return names, nil
+}
+
+// ViewNames connects to the CockroachDB database and
+// retrieves all view names from the information_schema where the
+// view schema is schema. It uses a whitelist and blacklist.
+func (d *CockroachDBDriver) ViewNames(schema string, whitelist, blacklist []string) ([]string, error) {
+	var names []string
+
+	query := fmt.Sprintf(`select table_name from information_schema.tables where table_schema = $1 and table_type = 'VIEW'`)
+	args := []interface{}{schema}
+	if len(whitelist) > 0 {
+		tables := drivers.TablesFromList(whitelist)
+		if len(tables) > 0 {
+			query += fmt.Sprintf(" and table_name in (%s);", strmangle.Placeholders(true, len(tables), 2, 1))
+			for _, w := range tables {
+				args = append(args, w)
+			}
+		}
+	} else if len(blacklist) > 0 {
+		tables := drivers.TablesFromList(blacklist)
+		if len(tables) > 0 {
+			query += fmt.Sprintf(" and table_name not in (%s);", strmangle.Placeholders(true, len(tables), 2, 1))
+			for _, b := range tables {
+				args = append(args, b)
+			}
+		}
+	}
+
+	rows, err := d.conn.Query(query, args...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		names = append(names, name)
+	}
+
+	return names, nil
+}
+
+// ViewCapabilities returns what actions are allowed for a view.
+func (d *CockroachDBDriver) ViewCapabilities(schema, name string) (drivers.ViewCapabilities, error) {
+	capabilities := drivers.ViewCapabilities{
+		CanInsert: false,
+		CanUpsert: false,
+	}
+
+	return capabilities, nil
+}
+
+// ViewColumns returns columns in a view
+func (d *CockroachDBDriver) ViewColumns(schema, tableName string, whitelist, blacklist []string) ([]drivers.Column, error) {
+	return d.Columns(schema, tableName, whitelist, blacklist)
 }
 
 // Columns takes a table name and attempts to retrieve the table information

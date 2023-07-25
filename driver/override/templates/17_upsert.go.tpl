@@ -1,3 +1,4 @@
+{{ if not .Table.IsView }}
 {{- $alias := .Aliases.Table .Table.Name}}
 {{- $schemaTable := .Table.Name | .SchemaTable}}
 {{if .AddGlobal -}}
@@ -159,3 +160,4 @@ func (o *{{$alias.UpSingular}}) Upsert({{if .NoContext}}exec boil.Executor{{else
 	return nil
 	{{- end}}
 }
+{{ end }}
