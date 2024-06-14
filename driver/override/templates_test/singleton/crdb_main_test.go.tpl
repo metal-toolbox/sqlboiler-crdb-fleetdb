@@ -26,12 +26,12 @@ func init() {
 func (c *crdbTester) setup() error {
   var err error
 
-  c.dbName = viper.GetString("crdb.dbname")
-  c.host = viper.GetString("crdb.host")
-  c.user = viper.GetString("crdb.user")
-  c.pass = viper.GetString("crdb.pass")
-  c.port = viper.GetInt("crdb.port")
-  c.sslmode = viper.GetString("crdb.sslmode")
+  c.dbName = viper.GetString("crdb-fleetdb.dbname")
+  c.host = viper.GetString("crdb-fleetdb.host")
+  c.user = viper.GetString("crdb-fleetdb.user")
+  c.pass = viper.GetString("crdb-fleetdb.pass")
+  c.port = viper.GetInt("crdb-fleetdb.port")
+  c.sslmode = viper.GetString("crdb-fleetdb.sslmode")
   // Create a randomized db name.
   c.testDBName = randomize.StableDBName(c.dbName)
 

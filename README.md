@@ -14,16 +14,16 @@ This is a fork of the Metal Toolbox version of https://github.com/glerchundi/sql
 
 ## Installation
 
-Installation is simple, just use go get. Once the binary is in your path sqlboiler will be able to use it if you run it with the driver name `crdb`.
+Installation is simple, just use go get. Once the binary (`sqlboiler-crdb-fleetdb`) is in your GOPATH sqlboiler will be able to use it if you run it with the driver name `crdb-fleetdb`.
 ```
 # Install sqlboiler crdb driver
 go get -u github.com/metal-toolbox/sqlboiler-crdb-fleetdb/v4
 # Generate models
-sqlboiler crdb
+sqlboiler crdb-fleetdb
 ```
 It's configuration keys in sqlboiler are simple:
 ```
-[crdb]
+[crdb-fleetdb]
 user="root"
 pass=""
 host="localhost"
@@ -31,6 +31,8 @@ port=26257
 dbname="mydatabase"
 sslmode="disable"
 ```
+
+(The following is from the original repo README)
 
 **Notes**:
 * I don't plan to support other than latest version of SQLBoiler.
