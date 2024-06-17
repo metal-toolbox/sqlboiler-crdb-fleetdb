@@ -1,4 +1,4 @@
-module github.com/infratographer/sqlboiler-crdb/v4
+module github.com/metal-toolbox/sqlboiler-crdb-fleetdb/v4
 
 go 1.18
 

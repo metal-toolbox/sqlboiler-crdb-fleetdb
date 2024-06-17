@@ -26,12 +26,12 @@ func init() {
 func (c *crdbTester) setup() error {
   var err error
 
-  c.dbName = viper.GetString("crdb.dbname")
-  c.host = viper.GetString("crdb.host")
-  c.user = viper.GetString("crdb.user")
-  c.pass = viper.GetString("crdb.pass")
-  c.port = viper.GetInt("crdb.port")
-  c.sslmode = viper.GetString("crdb.sslmode")
+  c.dbName = viper.GetString("crdb-fleetdb.dbname")
+  c.host = viper.GetString("crdb-fleetdb.host")
+  c.user = viper.GetString("crdb-fleetdb.user")
+  c.pass = viper.GetString("crdb-fleetdb.pass")
+  c.port = viper.GetInt("crdb-fleetdb.port")
+  c.sslmode = viper.GetString("crdb-fleetdb.sslmode")
   // Create a randomized db name.
   c.testDBName = randomize.StableDBName(c.dbName)
 
@@ -53,14 +53,14 @@ func (c *crdbTester) setup() error {
   createCmd.Stdin = newShowCreateTableFilter(newFKeyDestroyer(rgxCDBFkey, r))
 
   if err = dumpCmd.Start(); err != nil {
-      return errors.Wrap(err, "failed to start 'cockroach dump' command")
+      return errors.Wrap(err, "failed to start cockroach show-create command")
   }
   if err = createCmd.Start(); err != nil {
-      return errors.Wrap(err, "failed to start 'cockroach sql' command")
+      return errors.Wrap(err, "failed to start 'cockroach sql' command for db create")
   }
 
   if err = dumpCmd.Wait(); err != nil {
-      return errors.Wrap(err, "failed to wait for 'cockroach sql' command")
+      return errors.Wrap(err, "failed to wait for cockroach show-create command")
   }
 
   // After dumpCmd is done, close the write end of the pipe
@@ -69,7 +69,7 @@ func (c *crdbTester) setup() error {
   }
 
   if err = createCmd.Wait(); err != nil {
-      return errors.Wrap(err, "failed to wait for 'cockroach sql' command")
+      return errors.Wrap(err, "failed to wait for 'cockroach sql' command for db create")
   }
 
   return nil
@@ -176,6 +176,7 @@ func (f *showCreateFilter) Read(b []byte) (int, error) {
     all = bytes.Replace(all, []byte("create_statement"), []byte{}, -1)
     all = bytes.Replace(all, []byte("\"CREATE"), []byte("CREATE"), -1)
     all = bytes.Replace(all, []byte(";\""), []byte(";"), -1)
+    all = bytes.Replace(all, []byte(`""`), []byte(`"`), -1)
     f.buf = bytes.NewBuffer(all)
   }
 

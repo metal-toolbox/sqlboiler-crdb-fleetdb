@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/infratographer/sqlboiler-crdb/v4/driver"
+	"github.com/metal-toolbox/sqlboiler-crdb-fleetdb/v4/driver"
 	"github.com/volatiletech/sqlboiler/v4/drivers"
 )
 

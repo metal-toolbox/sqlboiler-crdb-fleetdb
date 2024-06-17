@@ -9,8 +9,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/infratographer/sqlboiler-crdb/v4/driver/override"
 	_ "github.com/lib/pq" // Side-effect import sql driver
+	"github.com/metal-toolbox/sqlboiler-crdb-fleetdb/v4/driver/override"
 	"github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/v4/drivers"
 	"github.com/volatiletech/sqlboiler/v4/importers"
